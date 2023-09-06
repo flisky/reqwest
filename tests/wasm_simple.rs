@@ -35,5 +35,21 @@ async fn request_with_timeout() {
         .expect_err("Expected error from aborted request");
 
     assert!(err.is_request());
-    assert!(format!("{:?}", err).contains("The user aborted a request."));
+    assert!(format!("{:?}", err).contains("The operation was aborted."));
+}
+
+#[wasm_bindgen_test]
+async fn request_builder_with_timeout() {
+    let client = reqwest::ClientBuilder::new()
+        .build()
+        .expect("client builder");
+    let err = client
+        .get("https://hyper.rs")
+        .timeout(Duration::from_millis(10))
+        .send()
+        .await
+        .expect_err("Expected error from aborted request");
+
+    assert!(err.is_request());
+    assert!(format!("{:?}", err).contains("The operation was aborted."));
 }
