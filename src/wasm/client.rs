@@ -1,5 +1,6 @@
 use http::{HeaderMap, Method};
 use js_sys::{Promise, JSON};
+use std::time::Duration;
 use std::{fmt, future::Future, sync::Arc};
 use url::Url;
 use wasm_bindgen::prelude::{wasm_bindgen, UnwrapThrowExt as _};
@@ -282,6 +283,19 @@ impl ClientBuilder {
         }
         self
     }
+
+    // Timeout options
+
+    /// Enables a request timeout.
+    ///
+    /// The timeout is applied from when the request starts connecting until the
+    /// response body has finished.
+    ///
+    /// Default is no timeout.
+    pub fn timeout(mut self, timeout: Duration) -> ClientBuilder {
+        self.config.timeout = Some(timeout);
+        self
+    }
 }
 
 impl Default for ClientBuilder {
@@ -293,12 +307,14 @@ impl Default for ClientBuilder {
 #[derive(Clone, Debug)]
 struct Config {
     headers: HeaderMap,
+    timeout: Option<Duration>,
 }
 
 impl Default for Config {
     fn default() -> Config {
         Config {
             headers: HeaderMap::new(),
+            timeout: None,
         }
     }
 }
